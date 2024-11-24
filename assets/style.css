@@ -1,0 +1,142 @@
+body {
+  background-color: green;
+  padding: 0;
+  margin: 0;
+}
+
+/* Define states */
+.link:hover {
+  background-color: #C0C0C0;
+}
+
+/* Define host states */
+.host {
+  border-bottom: 1px solid white;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.5rem;
+  font: 36px Helvetica;
+  font-weight: bold;
+}
+
+.host-0-1 {
+   background-color: green;
+}
+
+.host-1-0 {
+  background-color: #FF6666;
+}
+
+.host-1-1 {
+  background-color: #CC0000;
+}
+
+/* Define service states */
+.service {
+  border-bottom:1px solid white;
+  text-align: center;
+  padding: 0.5rem;
+  width: 40%;
+  font: 36px Helvetica;
+  font-weight: bold;
+}
+
+.service-0-1 {
+   background-color: green;
+}
+
+.service-1-0 {
+  background-color: #FFCC66;
+}
+
+.service-1-1 {
+  background-color: #FF9900;
+}
+
+.service-2-0 {
+  background-color: #FF6666;
+}
+
+.service-2-1 {
+  background-color: #CC0000;
+}
+
+.service-3-0 {
+  background-color: #3399CC;
+}
+
+.service-3-1 {
+  background-color: #3300CC;
+}
+
+/* Links */
+A:link {
+  text-decoration: none;
+  color: #000000;
+}
+
+A:visited {
+  text-decoration: none;
+  color: #000000;
+}
+
+A:active {
+  text-decoration: none;
+  color: #000000;
+}
+
+A:hover {
+  text-decoration: none;
+  color: #000000;
+}
+
+/* Info Bar */
+.info-bar {
+  background-color: #303030;
+  border-bottom: 1px solid #999;
+  font: 30px Helvetica;
+  width: 100%;
+}
+
+.info-bar-time {
+  color: #FFFFFF;
+  padding-right: 0.5rem;
+  text-align: right;
+}
+
+.info-bar-params {
+  color: #FFFFFF;
+  text-align: left;
+  font: 14px Helvetica;
+  padding-left: 0.4rem;
+}
+
+/* Info Statistics */
+.stats {
+  font: 25px Helvetica;
+  color: #FFFFFF;
+  border: 1px solid #999;
+  padding: 0.1rem;
+}
+
+.stats-value {
+  padding-right: 0.4rem;
+  padding-left: 0.4rem;
+}
+
+.stats-table {
+  border-color: #303030;
+  text-align: center;
+  margin: auto;
+}
+
+.stats-type {
+  background-color: #606060;
+  padding-right: 0.4rem;
+  padding-left: 0.4rem;
+}
+
+div .hooray {
+text-align: center;
+margin-top: 60px;
+}

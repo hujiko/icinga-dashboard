@@ -1,0 +1,69 @@
+
+<html>
+  <head>
+    <link rel="stylesheet" href="/assets/style.css" />
+    <title>Icinga2 Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <meta http-equiv="refresh" content="5">
+  </head>
+  <body>
+    <div>
+    {{ if .Error }}
+      <b>{{.Error}}</b>
+    {{ else }}
+    <table class="info-bar">
+      <tr>
+        <td class="info-bar-params">
+          Minimal State Type: {{.MinStateType}}<br/>
+          Minimal State: {{.MinState}}<br/>
+          Maximal State: {{.MaxState}}<br/>
+        </td>
+        <td>
+          <table class="stats stats-table">
+            <tr>
+              <td class="stats-type stats">Hosts: </td>
+              <td class="stats stats-value host-0-1">{{.CIBStatus.NumHostsUp}}</td>
+              <td class="stats stats-value host-0-1">{{.CIBStatus.PercentHostsUp}}%</td>
+              <td class="stats stats-value host-1-1">{{.CIBStatus.NumHostsDown}}</td>
+              <td width="5%"></td>
+              <td class="stats-type stats">Services: </td>
+              <td class="stats stats-value service-0-1">{{.CIBStatus.NumServicesOk}}</td>
+              <td class="stats stats-value service-0-1">{{.CIBStatus.PercentServicesOk}}%</td>
+              <td class="stats stats-value service-1-1">{{.CIBStatus.NumServicesWarning}}</td>
+              <td class="stats stats-value service-2-1">{{.CIBStatus.NumServicesCritical}}</td>
+              <td class="stats stats-value service-3-1">{{.CIBStatus.NumServicesUnknown}}</td>
+            </tr>
+          </table>
+        </td>
+        <td class="info-bar-time">{{.Time}}</td>
+      </tr>
+    </table>
+    <table width="100%" cellspacing="0" cellpadding="3">
+      {{range .HostRecords}}
+      <tr class="host-{{.State}}-{{.StateType}}">
+          <td class="host link"><a href="{{.BaseURL}}/host/show?host={{ .UrlEncodedHost }}" target="_blank">{{ .Name }}</a></td>
+          <td class="host">&nbsp;</td>
+      </tr>
+      {{ end }}
+        
+      {{range .ServiceRecords}}
+        <tr class="service-{{.State}}-{{.StateType}}">
+          <td class="service link" width="40%">
+            {{ if .IsAggregated }}
+              {{ .HostField }}
+            {{ else }}
+              <a href="{{.BaseURL}}/host/show?host={{ .UrlEncodedHost }}" target="_blank">{{ .HostField }}</a>
+            {{ end }}
+          </td>
+          <td class="service link">
+            <a href="{{.BaseURL}}/list/services?service={{ .UrlEncodedService }}&service_state={{ .State }}&service_handled=0">
+              {{ .ServiceField }}
+            </a>
+          </td>
+        </tr>
+      {{end}}
+    </table>
+    {{end}}
+  </div>
+  </body>
+</html>
