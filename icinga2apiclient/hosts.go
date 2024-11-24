@@ -1,10 +1,8 @@
 package icinga2apiclient
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -20,51 +18,32 @@ func (client *Client) GetHosts(minStateType int) ([]Host, error) {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/v1/objects/hosts", client.Hostname)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayload))
+	responseBody, err := client.makeRequest(http.MethodPost, "/v1/objects/hosts", jsonPayload)
 	if err != nil {
-		fmt.Printf("Error creating request: %v\n", err)
-		return nil, err
-	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-	// Icinga wants a GET, but GET requests can't contain a payload
-	req.Header.Set("X-HTTP-Method-Override", "GET")
-
-	if client.Username != "" && client.Password != "" {
-		req.SetBasicAuth(client.Username, client.Password)
-	}
-
-	resp, err := client.httpClient.Do(req)
-	if err != nil {
-		fmt.Printf("Error sending request: %v\n", err)
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("Error reading response body: %v\n", err)
+		fmt.Printf("Error fetching hosts: %v\n", err)
 		return nil, err
 	}
 
 	var responseStruct getHostsResponse
-	json.Unmarshal(body, &responseStruct)
+	err = json.Unmarshal(responseBody, &responseStruct)
+	if err != nil {
+		fmt.Printf("Unable to parse JSON: %v\n", err)
+		return nil, err
+	}
 
 	var hosts []Host
-	for _, hostJson := range responseStruct.Results {
-		hosts = append(hosts, NewHostFromJson(hostJson))
+	for _, hostJSON := range responseStruct.Results {
+		hosts = append(hosts, NewHostFromJSON(hostJSON))
 	}
 
 	return hosts, nil
 }
 
-func NewHostFromJson(hostJson icinga2HostJson) Host {
+func NewHostFromJSON(hostJSON icinga2hostJSON) Host {
 	host := Host{
-		Name:      hostJson.Name,
-		State:     hostJson.Attributes.State,
-		StateType: hostJson.Attributes.StateType,
+		Name:      hostJSON.Name,
+		State:     hostJSON.Attributes.State,
+		StateType: hostJSON.Attributes.StateType,
 	}
 
 	return host

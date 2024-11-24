@@ -1,9 +1,11 @@
 package icinga2apiclient
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -52,4 +54,35 @@ func NewClient(hostName string, certFile string, keyFile string, caCertFile stri
 		httpClient: client,
 		Hostname:   hostName,
 	}, nil
+}
+
+func (client *Client) makeRequest(verb string, path string, payload []byte) ([]byte, error) {
+	url := client.Hostname + path
+	req, err := http.NewRequest(verb, url, bytes.NewBuffer(payload))
+	if err != nil {
+		fmt.Printf("Error creating request: %v\n", err)
+		return nil, err
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+	// Icinga wants a GET, but GET requests can't contain a payload
+	req.Header.Set("X-HTTP-Method-Override", "GET")
+
+	if client.Username != "" && client.Password != "" {
+		req.SetBasicAuth(client.Username, client.Password)
+	}
+
+	resp, err := client.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
 }

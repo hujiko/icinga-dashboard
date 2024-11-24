@@ -12,11 +12,13 @@ import (
 	"github.com/hujiko/icinga-dashboard/icinga2apiclient"
 )
 
-var client *icinga2apiclient.Client
-var defaultMinState int
-var defaultMaxState int
-var defaultMinStateType int
-var baseURL string
+var (
+	client              *icinga2apiclient.Client
+	defaultMinState     int
+	defaultMaxState     int
+	defaultMinStateType int
+	baseURL             string
+)
 
 func main() {
 	envVariables := parseEnvVariables()
@@ -222,7 +224,7 @@ func parseEnvVariables() map[string]interface{} {
 		// Define the password here
 		"ICINGA2_API_PASSWORD": "",
 
-		// Lowest state a service has to be in, in order to be shown on the dashboad.
+		// Lowest state a service has to be in, in order to be shown on the dashboard.
 		// Possible values
 		// 0 => OK
 		// 1 => Warning
@@ -231,7 +233,7 @@ func parseEnvVariables() map[string]interface{} {
 		// This value can be overwritten by the query parameter "minState" when opening the dashboard in a browser.
 		"MIN_STATE": 1,
 
-		// Highest state a service/host can be in, in order to be shown on the dashboad.
+		// Highest state a service/host can be in, in order to be shown on the dashboard.
 		// Possible values
 		// 0 => OK
 		// 1 => Warning
@@ -240,7 +242,7 @@ func parseEnvVariables() map[string]interface{} {
 		// This value can be overwritten by the query parameter "maxState" when opening the dashboard in a browser.
 		"MAX_STATE": 2,
 
-		// min state type a service/host should have, in order to be shown on the dashboad.
+		// min state type a service/host should have, in order to be shown on the dashboard.
 		// Possible values
 		// 0 => Soft state
 		// 1 => hard state
@@ -275,7 +277,7 @@ func parseEnvVariables() map[string]interface{} {
 	requiredVars := []string{"LISTEN_ADDRESS", "ICINGA2_BASE_URL", "ICINGA2_API_URL"}
 	for _, varName := range requiredVars {
 		if envValues[varName] == "" {
-			panic(fmt.Sprintf("%s can't be empty!", varName))
+			panic(varName + " can't be empty!")
 		}
 	}
 
@@ -292,9 +294,9 @@ func stateNumToString(state int) string {
 
 	if state > len(mapping) {
 		return "---"
-	} else {
-		return mapping[state]
 	}
+
+	return mapping[state]
 }
 
 func stateTypeNumToString(stateType int) string {
@@ -305,7 +307,7 @@ func stateTypeNumToString(stateType int) string {
 
 	if stateType > len(mapping) {
 		return "---"
-	} else {
-		return mapping[stateType]
 	}
+
+	return mapping[stateType]
 }

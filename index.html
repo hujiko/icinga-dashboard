@@ -41,7 +41,7 @@
     <table width="100%" cellspacing="0" cellpadding="3">
       {{range .HostRecords}}
       <tr class="host-{{.State}}-{{.StateType}}">
-          <td class="host link"><a href="{{.BaseURL}}/host/show?host={{ .UrlEncodedHost }}" target="_blank">{{ .Name }}</a></td>
+          <td class="host link"><a href="{{.BaseURL}}/host/show?host={{ .URLEncodedHost }}" target="_blank">{{ .Name }}</a></td>
           <td class="host">&nbsp;</td>
       </tr>
       {{ end }}
@@ -52,11 +52,11 @@
             {{ if .IsAggregated }}
               {{ .HostField }}
             {{ else }}
-              <a href="{{.BaseURL}}/host/show?host={{ .UrlEncodedHost }}" target="_blank">{{ .HostField }}</a>
+              <a href="{{.BaseURL}}/host/show?host={{ .URLEncodedHost }}" target="_blank">{{ .HostField }}</a>
             {{ end }}
           </td>
           <td class="service link">
-            <a href="{{.BaseURL}}/list/services?service={{ .UrlEncodedService }}&service_state={{ .State }}&service_handled=0">
+            <a href="{{.BaseURL}}/list/services?service={{ .URLEncodedService }}&service_state={{ .State }}&service_handled=0">
               {{ .ServiceField }}
             </a>
           </td>

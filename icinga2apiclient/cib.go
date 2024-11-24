@@ -3,26 +3,8 @@ package icinga2apiclient
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
-
-type cibStatusResponse struct {
-	Results []cIBStatusResult `json:"results"`
-}
-type cIBStatusResult struct {
-	Name   string    `json:"name"`
-	Status CIBStatus `json:"status"`
-}
-
-type CIBStatus struct {
-	NumHostsUp          int `json:"num_hosts_up"`
-	NumHostsDown        int `json:"num_hosts_down"`
-	NumServicesOk       int `json:"num_services_ok"`
-	NumServicesWarning  int `json:"num_services_warning"`
-	NumServicesCritical int `json:"num_services_critical"`
-	NumServicesUnknown  int `json:"num_services_unknown"`
-}
 
 func (s *CIBStatus) PercentHostsUp() float32 {
 	sumOfHosts := float32(s.NumHostsUp + s.NumHostsDown)
@@ -41,35 +23,18 @@ func (s *CIBStatus) PercentServicesOk() float32 {
 }
 
 func (client *Client) GetCIBStatus() (*CIBStatus, error) {
-	url := fmt.Sprintf("%s/v1/status/CIB", client.Hostname)
-	req, err := http.NewRequest("GET", url, nil)
+	responseBody, err := client.makeRequest(http.MethodGet, "/v1/status/CIB", nil)
 	if err != nil {
-		fmt.Printf("Error creating request: %v\n", err)
-		return nil, err
-	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-
-	if client.Username != "" && client.Password != "" {
-		req.SetBasicAuth(client.Username, client.Password)
-	}
-
-	resp, err := client.httpClient.Do(req)
-	if err != nil {
-		fmt.Printf("Error sending request: %v\n", err)
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("Error reading response body: %v\n", err)
+		fmt.Printf("Error fetching CIB status: %v\n", err)
 		return nil, err
 	}
 
 	var cibStatusResponseStruct cibStatusResponse
-	json.Unmarshal(body, &cibStatusResponseStruct)
+	err = json.Unmarshal(responseBody, &cibStatusResponseStruct)
+	if err != nil {
+		fmt.Printf("Unable to parse JSON: %v\n", err)
+		return nil, err
+	}
 
 	return &cibStatusResponseStruct.Results[0].Status, nil
 }

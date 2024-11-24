@@ -34,15 +34,15 @@ type PageHostListRecord struct {
 	Name      string
 }
 
-func (r *PageHostListRecord) UrlEncodedHost() string {
+func (r *PageHostListRecord) URLEncodedHost() string {
 	return url.QueryEscape(r.Name)
 }
 
-func (r *PageServiceListRecord) UrlEncodedHost() string {
+func (r *PageServiceListRecord) URLEncodedHost() string {
 	return url.QueryEscape(r.HostField)
 }
 
-func (r *PageServiceListRecord) UrlEncodedService() string {
+func (r *PageServiceListRecord) URLEncodedService() string {
 	return url.QueryEscape(r.ServiceField)
 }
 

@@ -21,16 +21,16 @@ type requestPayload struct {
 }
 
 type getServiceResponse struct {
-	Results []icinga2ServiceJson `json:"results"`
+	Results []icinga2serviceJSON `json:"results"`
 }
 
 type getHostsResponse struct {
-	Results []icinga2HostJson `json:"results"`
+	Results []icinga2hostJSON `json:"results"`
 }
 
 // {"attrs":{"acknowledgement":0,"display_name":"disk-timeouts","downtime_depth":0,"name":"disk-timeouts","state":3,
 // "state_type":1,"vars":{"oncall":"plaser"}},"joins":{},"meta":{},"name":"keepalived-1.graylog-coresec.ams1!disk-timeouts","type":"Service"}
-type icinga2ServiceAttributesJson struct {
+type icinga2ServiceAttributesJSON struct {
 	Acknowledgement int                    `json:"acknowledgement"`
 	DisplayName     string                 `json:"display_name"`
 	DowntimeDepth   int                    `json:"downtime_depth"`
@@ -40,7 +40,7 @@ type icinga2ServiceAttributesJson struct {
 	Vars            map[string]interface{} `json:"vars"`
 }
 
-type icinga2HostAttributesJson struct {
+type icinga2HostAttributesJSON struct {
 	Acknowledgement int                    `json:"acknowledgement"`
 	Name            string                 `json:"name"`
 	State           int                    `json:"state"`
@@ -48,18 +48,34 @@ type icinga2HostAttributesJson struct {
 	Vars            map[string]interface{} `json:"vars"`
 }
 
-type icinga2ServiceJson struct {
-	Attributes icinga2ServiceAttributesJson `json:"attrs"`
+type icinga2serviceJSON struct {
+	Attributes icinga2ServiceAttributesJSON `json:"attrs"`
 	Name       string                       `json:"name"`
 	Type       string                       `json:"type"`
 }
 
-type icinga2HostJson struct {
-	Attributes icinga2HostAttributesJson `json:"attrs"`
+type icinga2hostJSON struct {
+	Attributes icinga2HostAttributesJSON `json:"attrs"`
 	Name       string                    `json:"name"`
 	Type       string                    `json:"type"`
 }
 
+type cibStatusResponse struct {
+	Results []cIBStatusResult `json:"results"`
+}
+type cIBStatusResult struct {
+	Name   string    `json:"name"`
+	Status CIBStatus `json:"status"`
+}
+
+type CIBStatus struct {
+	NumHostsUp          int `json:"num_hosts_up"`
+	NumHostsDown        int `json:"num_hosts_down"`
+	NumServicesOk       int `json:"num_services_ok"`
+	NumServicesWarning  int `json:"num_services_warning"`
+	NumServicesCritical int `json:"num_services_critical"`
+	NumServicesUnknown  int `json:"num_services_unknown"`
+}
 type Service struct {
 	HostName    string
 	ServiceName string
