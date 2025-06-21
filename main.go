@@ -42,7 +42,7 @@ func main() {
 	defaultMinState = envVariables["MIN_STATE"].(int)
 	defaultMaxState = envVariables["MAX_STATE"].(int)
 	defaultMinStateType = envVariables["MIN_STATE_TYPE"].(int)
-	baseURL = envVariables["MIN_STATE_TYPE"].(string)
+	baseURL = envVariables["ICINGA2_BASE_URL"].(string)
 
 	// If path starts with /assets/ then serve static files from assets/
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
