@@ -52,11 +52,11 @@
             {{ if .IsAggregated }}
               {{ .HostField }}
             {{ else }}
-              <a href="{{.BaseURL}}/host/show?host={{ .URLEncodedHost }}" target="_blank">{{ .HostField }}</a>
+              <a href="{{$.BaseURL}}/host/show?host={{ .URLEncodedHost }}" target="_blank">{{ .HostField }}</a>
             {{ end }}
           </td>
           <td class="service link">
-            <a href="{{.BaseURL}}/list/services?service={{ .URLEncodedService }}&service_state={{ .State }}&service_handled=0">
+            <a href="{{$.BaseURL}}/list/services?service={{ .URLEncodedService }}&service_state={{ .State }}&service_handled=0">
               {{ .ServiceField }}
             </a>
           </td>

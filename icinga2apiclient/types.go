@@ -1,6 +1,7 @@
 package icinga2apiclient
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -87,4 +88,14 @@ type Host struct {
 	Name      string
 	State     int
 	StateType int
+}
+
+type HTTPError struct {
+	StatusCode int
+	Status     string
+	Body       string
+}
+
+func (e *HTTPError) Error() string {
+	return fmt.Sprintf("HTTP %d: %s - %s", e.StatusCode, e.Status, e.Body)
 }

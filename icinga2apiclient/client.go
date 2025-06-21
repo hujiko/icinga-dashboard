@@ -84,5 +84,13 @@ func (client *Client) makeRequest(verb string, path string, payload []byte) ([]b
 		return nil, err
 	}
 
+	if resp.StatusCode > 299 {
+		return nil, &HTTPError{
+			StatusCode: resp.StatusCode,
+			Status:     resp.Status,
+			Body:       string(body),
+		}
+	}
+
 	return body, nil
 }
