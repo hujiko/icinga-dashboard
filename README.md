@@ -14,7 +14,7 @@ services:
     image: hujiko/icinga-dashboard:latest
     environment:
       - LISTEN_ADDRESS=":8080"
-      - ICINGA2_BASE_URL="https://icinga2.example.com/monitoring"
+      - ICINGA2_BASE_URL="https://icinga2.example.com/icingadb"
       - ICINGA2_API_URL="https://icinga2.example.com:5665"
       - ICINGA2_API_USERNAME="admin"
       - ICINGA2_API_PASSWORD="changeme"
@@ -32,7 +32,7 @@ The dashboard can be configured through environment variables:
 
   # Hostname of the Icinga2 web interface.
   # When clicking on the dashboard, this is what you will be directed to
-  export ICINGA2_BASE_URL="https://icinga2.example.com/monitoring"
+  export ICINGA2_BASE_URL="https://icinga2.example.com/icingadb"
 
   # Hostname of the Icinga2 REST API (with protocol, but without trailing slash)
   export ICINGA2_API_URL="https://icinga2.example.com:5665"
