@@ -21,6 +21,10 @@
         <td>
           <table class="stats stats-table">
             <tr>
+              {{ if .NotificationsDisabled }}
+              <td class="stats stats-value host-1-1">Notifications disabled!</td>
+              <td width="5%"></td>
+              {{ end }}
               <td class="stats-type stats">Hosts: </td>
               <td class="stats stats-value host-0-1">{{.CIBStatus.NumHostsUp}}</td>
               <td class="stats stats-value host-0-1">{{.CIBStatus.PercentHostsUp}}%</td>

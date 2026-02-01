@@ -90,6 +90,18 @@ func renderDashboard(w http.ResponseWriter, r *http.Request) {
 		BaseURL:      baseURL,
 	}
 
+	appStatus, err := client.GetIcingaApplicationStatus()
+	if err != nil {
+		fmt.Printf("Error getting IcingaApplication status: %v\n", err)
+		pageVariables.Error = err
+		err = tmpl.Execute(w, pageVariables)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	pageVariables.NotificationsDisabled = !appStatus.EnableNotifications
+
 	cibStatus, err := client.GetCIBStatus()
 	if err != nil {
 		fmt.Printf("Error getting hosts: %v\n", err)

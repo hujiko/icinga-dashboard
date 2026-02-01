@@ -7,16 +7,17 @@ import (
 )
 
 type PageVariables struct {
-	Title          string
-	Time           string
-	ServiceRecords []PageServiceListRecord
-	HostRecords    []PageHostListRecord
-	CIBStatus      *icinga2apiclient.CIBStatus
-	MinStateType   string
-	MinState       string
-	MaxState       string
-	Error          error
-	BaseURL        string
+	Title                 string
+	Time                  string
+	ServiceRecords        []PageServiceListRecord
+	HostRecords           []PageHostListRecord
+	CIBStatus             *icinga2apiclient.CIBStatus
+	MinStateType          string
+	MinState              string
+	MaxState              string
+	Error                 error
+	BaseURL               string
+	NotificationsDisabled bool
 }
 
 type PageServiceListRecord struct {
