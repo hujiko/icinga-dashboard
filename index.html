@@ -45,7 +45,7 @@
     <table width="100%" cellspacing="0" cellpadding="3">
       {{range .HostRecords}}
       <tr class="host-{{.State}}-{{.StateType}}">
-          <td class="host link"><a href="{{.BaseURL}}/host?name={{ .URLEncodedHost }}" target="_blank">{{ .Name }}</a></td>
+          <td class="host link"><a href="{{$.BaseURL}}/host?name={{ .URLEncodedHost }}" target="_blank">{{ .Name }}</a></td>
           <td class="host">&nbsp;</td>
       </tr>
       {{ end }}
