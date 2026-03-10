@@ -45,6 +45,5 @@ func NewHostFromJSON(hostJSON icinga2hostJSON) Host {
 		State:     hostJSON.Attributes.State,
 		StateType: hostJSON.Attributes.StateType,
 	}
-
 	return host
 }

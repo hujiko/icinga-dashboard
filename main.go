@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -50,6 +51,7 @@ func main() {
 
 	// Define the handler for the root URL
 	http.HandleFunc("/", renderDashboard)
+	http.HandleFunc("/api/v1/dashboard", renderJSON)
 
 	fmt.Printf("Starting webserver. Listening on %s\n", envVariables["LISTEN_ADDRESS"])
 	err = http.ListenAndServe(envVariables["LISTEN_ADDRESS"].(string), nil)
@@ -59,16 +61,42 @@ func main() {
 }
 
 func renderDashboard(w http.ResponseWriter, r *http.Request) {
-	minStateType := defaultMinStateType
-	minState := defaultMinState
-	maxState := defaultMaxState
+	pageVariables := buildPageVariables(r)
+	if pageVariables.Error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 
-	// Parse the HTML template
-	tmpl, err := template.ParseFiles("index.html")
+	tmpl, tmplErr := template.ParseFiles("index.html")
+	if tmplErr != nil {
+		http.Error(w, tmplErr.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	errExec := tmpl.Execute(w, pageVariables)
+	if errExec != nil {
+		http.Error(w, errExec.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func renderJSON(w http.ResponseWriter, r *http.Request) {
+	pageVariables := buildPageVariables(r)
+	if pageVariables.Error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(pageVariables)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func buildPageVariables(r *http.Request) PageVariables {
+	minStateType := defaultMinStateType
+	minState := defaultMinState
+	maxState := defaultMaxState
 
 	queryParamters := r.URL.Query()
 	if value, err := strconv.Atoi(queryParamters.Get("minStateType")); err == nil {
@@ -81,38 +109,28 @@ func renderDashboard(w http.ResponseWriter, r *http.Request) {
 		maxState = value
 	}
 
-	// Define the data to pass to the template
 	pageVariables := PageVariables{
-		Time:         time.Now().Format("15:04:05"),
+		TimeString:   time.Now().Format("15:04:05"),
+		Time:         timestamp{time.Now()},
 		MinStateType: stateTypeNumToString(minStateType),
 		MinState:     stateNumToString(minState),
 		MaxState:     stateNumToString(maxState),
 		BaseURL:      baseURL,
 	}
 
-	appStatus, err := client.GetIcingaApplicationStatus()
-	if err != nil {
+	if appStatus, err := client.GetIcingaApplicationStatus(); err != nil {
 		fmt.Printf("Error getting IcingaApplication status: %v\n", err)
 		pageVariables.Error = err
-		err = tmpl.Execute(w, pageVariables)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
+	} else {
+		pageVariables.NotificationsDisabled = !appStatus.EnableNotifications
 	}
-	pageVariables.NotificationsDisabled = !appStatus.EnableNotifications
 
-	cibStatus, err := client.GetCIBStatus()
-	if err != nil {
+	if cibStatus, err := client.GetCIBStatus(); err != nil {
 		fmt.Printf("Error getting hosts: %v\n", err)
 		pageVariables.Error = err
-		err = tmpl.Execute(w, pageVariables)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	} else {
+		pageVariables.CIBStatus = cibStatus
 	}
-	pageVariables.CIBStatus = cibStatus
 
 	pageVariables.ServiceRecords = getAndSortServices(client, minState, maxState, minStateType)
 
@@ -120,35 +138,21 @@ func renderDashboard(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Printf("Error getting hosts: %v\n", err)
 		pageVariables.Error = err
-		err = tmpl.Execute(w, pageVariables)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
 	}
 
-	var hostList []PageHostListRecord
+	pageVariables.HostRecords = make([]PageHostListRecord, 0)
 	for _, host := range hosts {
-		hostList = append(hostList, PageHostListRecord{
+		pageVariables.HostRecords = append(pageVariables.HostRecords, PageHostListRecord{
 			Name:      host.Name,
 			State:     host.State,
 			StateType: host.StateType,
 		})
 	}
-	pageVariables.HostRecords = hostList
 
-	// Sort the services by State
 	sort.Sort(ByState(pageVariables.ServiceRecords))
-
-	// Sort the hosts by Name
 	sort.Sort(ByName(pageVariables.HostRecords))
 
-	// Execute the template with the data
-	err = tmpl.Execute(w, pageVariables)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	return pageVariables
 }
 
 func getAndSortServices(client *icinga2apiclient.Client, minState int, maxState int, minStateType int) []PageServiceListRecord {
@@ -178,7 +182,7 @@ func getAndSortServices(client *icinga2apiclient.Client, minState int, maxState 
 
 		resultSet = append(resultSet, PageServiceListRecord{
 			HostField:    hostField,
-			ServiceField: group[0].ServiceName,
+			Name:         group[0].ServiceName,
 			State:        group[0].State,
 			StateType:    group[0].StateType,
 			IsAggregated: isAggregated,
@@ -304,7 +308,7 @@ func stateNumToString(state int) string {
 		"Unknown",
 	}
 
-	if state > len(mapping) {
+	if state < 0 || state >= len(mapping) {
 		return "---"
 	}
 
@@ -317,7 +321,7 @@ func stateTypeNumToString(stateType int) string {
 		"Hard",
 	}
 
-	if stateType > len(mapping) {
+	if stateType < 0 || stateType >= len(mapping) {
 		return "---"
 	}
 

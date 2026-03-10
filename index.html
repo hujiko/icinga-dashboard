@@ -39,7 +39,7 @@
             </tr>
           </table>
         </td>
-        <td class="info-bar-time">{{.Time}}</td>
+        <td class="info-bar-time">{{.TimeString}}</td>
       </tr>
     </table>
     <table width="100%" cellspacing="0" cellpadding="3">
@@ -61,7 +61,7 @@
           </td>
           <td class="service link">
             <a href="{{$.BaseURL}}/services?name={{ .URLEncodedService }}&service.state.soft_state={{ .State }}&service.state.is_handled=n">
-              {{ .ServiceField }}
+              {{ .Name }}
             </a>
           </td>
         </tr>
