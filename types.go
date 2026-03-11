@@ -23,11 +23,13 @@ type PageVariables struct {
 }
 
 type PageServiceListRecord struct {
-	Name         string `json:"name"`
-	HostField    string `json:"host_field"`
-	State        int    `json:"state"`
-	StateType    int    `json:"state_type"`
-	IsAggregated bool   `json:"is_aggregated"`
+	Name                 string   `json:"name"`
+	HostField            string   `json:"host_field"`
+	State                int      `json:"state"`
+	StateType            int      `json:"state_type"`
+	IsAggregated         bool     `json:"is_aggregated"`
+	AggregatedHosts      []string `json:"aggregated_hosts"`
+	AggregatedHostsCount int      `json:"aggregated_hosts_count"`
 }
 
 type PageHostListRecord struct {

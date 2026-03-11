@@ -161,6 +161,10 @@ func getAndSortServices(client *icinga2apiclient.Client, minState int, maxState 
 		fmt.Printf("Error getting hosts: %v\n", err)
 	}
 
+	return buildServiceListRecords(services)
+}
+
+func buildServiceListRecords(services []icinga2apiclient.Service) []PageServiceListRecord {
 	groupedServices := make(map[string][]icinga2apiclient.Service)
 	for _, service := range services {
 		groupKey := fmt.Sprintf("%s-%d-%d", service.ServiceName, service.State, service.StateType)
@@ -186,6 +190,14 @@ func getAndSortServices(client *icinga2apiclient.Client, minState int, maxState 
 			State:        group[0].State,
 			StateType:    group[0].StateType,
 			IsAggregated: isAggregated,
+			AggregatedHosts: func() []string {
+				var hosts []string
+				for _, service := range group {
+					hosts = append(hosts, service.HostName)
+				}
+				return hosts
+			}(),
+			AggregatedHostsCount: len(group),
 		})
 	}
 
