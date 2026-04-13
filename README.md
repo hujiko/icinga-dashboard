@@ -83,3 +83,38 @@ The dashboard can be configured through environment variables:
   # This value can be overwritten by the query parameter "maxStateType=" when opening the dashboard in a browser.
   export MIN_STATE_TYPE=0
 ```
+
+## SwiftBar Plugin
+
+The repository includes a SwiftBar plugin for macOS that displays Icinga alerts directly in your menu bar.
+
+### What is it?
+
+The SwiftBar plugin (`swiftbar/icinga.30s.sh`) queries your Icinga2 dashboard API and shows the number and details of current warnings and critical alerts as a live menu bar item. It provides direct links to your IcingaWeb2 interface for quick access and management.
+
+### How to install SwiftBar
+
+1. Download SwiftBar from [swiftbar.app](https://swiftbar.app/).
+2. Move SwiftBar to your Applications folder and launch it.
+
+### How to install the plugin
+
+1. Copy the file `swiftbar/icinga.30s.sh` from this repository to your SwiftBar plugins directory (default: `~/Library/Application Support/SwiftBar/Plugins/`).
+2. Make the script executable:
+   ```bash
+   chmod +x ~/Library/Application\ Support/SwiftBar/Plugins/icinga.30s.sh
+   ```
+3. Edit the script to match your Icinga2 API URL and credentials if needed (see variables at the top of the script).
+4. Ensure you have `jq` and `curl` installed (the script will auto-detect `jq`).
+
+### Usage
+
+- The plugin will automatically refresh every 30 seconds (as indicated by the filename `icinga.30s.sh`).
+- Click on the menu bar item to see a list of current problems and direct links to acknowledge or schedule downtime in IcingaWeb2.
+- If your VPN is not connected or the API is unreachable, the plugin will indicate this in the menu bar.
+
+### Troubleshooting
+
+- Make sure your API endpoint is reachable from your Mac.
+- The script requires `jq` and `curl` to be installed and available in your PATH.
+- For more details, see comments in the script file itself.

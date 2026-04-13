@@ -14,18 +14,25 @@ import (
 )
 
 var (
-	client              *icinga2apiclient.Client
+	client              dashboardClient
 	defaultMinState     int
 	defaultMaxState     int
 	defaultMinStateType int
 	baseURL             string
+	now                 = time.Now
 )
+
+type dashboardClient interface {
+	GetIcingaApplicationStatus() (*icinga2apiclient.IcingaApplication, error)
+	GetCIBStatus() (*icinga2apiclient.CIBStatus, error)
+	GetServices(minState int, maxState int, minStateType int) ([]icinga2apiclient.Service, error)
+	GetHosts(minStateType int) ([]icinga2apiclient.Host, error)
+}
 
 func main() {
 	envVariables := parseEnvVariables()
 
-	var err error
-	client, err = icinga2apiclient.NewClient(
+	apiClient, err := icinga2apiclient.NewClient(
 		envVariables["ICINGA2_API_URL"].(string),
 		envVariables["ICINGA2_API_CLIENT_CERT_PATH"].(string),
 		envVariables["ICINGA2_API_CLIENT_KEY_PATH"].(string),
@@ -37,8 +44,9 @@ func main() {
 		fmt.Printf("Error configuring API client: %v\n", err)
 	}
 
-	client.Username = envVariables["ICINGA2_API_USERNAME"].(string)
-	client.Password = envVariables["ICINGA2_API_PASSWORD"].(string)
+	apiClient.Username = envVariables["ICINGA2_API_USERNAME"].(string)
+	apiClient.Password = envVariables["ICINGA2_API_PASSWORD"].(string)
+	client = apiClient
 
 	defaultMinState = envVariables["MIN_STATE"].(int)
 	defaultMaxState = envVariables["MAX_STATE"].(int)
@@ -109,9 +117,10 @@ func buildPageVariables(r *http.Request) PageVariables {
 		maxState = value
 	}
 
+	currentTime := now()
 	pageVariables := PageVariables{
-		TimeString:   time.Now().Format("15:04:05"),
-		Time:         timestamp{time.Now()},
+		TimeString:   currentTime.Format("15:04:05"),
+		Time:         timestamp{currentTime},
 		MinStateType: stateTypeNumToString(minStateType),
 		MinState:     stateNumToString(minState),
 		MaxState:     stateNumToString(maxState),
@@ -155,7 +164,7 @@ func buildPageVariables(r *http.Request) PageVariables {
 	return pageVariables
 }
 
-func getAndSortServices(client *icinga2apiclient.Client, minState int, maxState int, minStateType int) []PageServiceListRecord {
+func getAndSortServices(client dashboardClient, minState int, maxState int, minStateType int) []PageServiceListRecord {
 	services, err := client.GetServices(minState, maxState, minStateType)
 	if err != nil {
 		fmt.Printf("Error getting hosts: %v\n", err)
